@@ -1,0 +1,21 @@
+- name: create ec2 instance and create route53
+  hotst: local
+  connection: local
+  become: yes
+  vars:
+    ami_id: ami-0220d79f3f480ecf5
+    sg_id: sg-09cddc7470b03f555
+    zone_id: "Z0509026150WVAAHWU7IF"
+    domain_name: "daws89s.fun"
+    instances:
+    - mongodb
+  tasks:
+  - name: create ec2 instance
+    amazon.aws.ec2_instance:
+      name: "{{ item }}"
+      instance_type: t3.micro
+      security_group: "{{ sg_id }}"
+      image_id: "{{ ami_id }}"
+      tags:
+        Name: "{{ item }}"
+    loop: "{{ instances }}"
