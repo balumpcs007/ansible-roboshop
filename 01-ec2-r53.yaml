@@ -1,5 +1,5 @@
 - name: create ec2 instance and create route53
-  hotst: local
+  hosts: local
   connection: local
   become: yes
   vars:
