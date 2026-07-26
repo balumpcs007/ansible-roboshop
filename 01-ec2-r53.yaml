@@ -19,3 +19,7 @@
       tags:
         Name: "{{ item }}"
     loop: "{{ instances }}"
+    register: ec2_output
+  - name: print ec2 output
+    ansbile.builtin.debug:
+      msg: "{{ ec2_output }}"
