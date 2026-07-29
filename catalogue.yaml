@@ -1,6 +1,6 @@
 - name: catalogue configuration
   hosts: catalogue
-  becone: yes
+  become: yes
   tasks:
   - name: disable nodejs
     ansible.builtin.command:
