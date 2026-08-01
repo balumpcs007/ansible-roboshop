@@ -5,13 +5,16 @@
   - name: disable nodejs
     ansible.builtin.command:
       cmd: dnf module disable nodejs -y
+
   - name: enable nodejs
     ansible.builtin.command:
       cmd: dnf module enable nodejs:20 -y
+
   - name: install nodejs
     ansible.builtin.dnf:
       name: nodejs
       state: present
+
   - name: create system user
     ansible.builtin.user:
       name: roboshop
@@ -19,34 +22,42 @@
       shell: /sbin/nologin
       system: true
       home: /app
+
   - name: remove app directory
     ansible.builtin.file:
       path: /app
       state: absent
+
   - name: create app directory
     ansible.builtin.file:
       path: /app
       state: directory
+
   - name: remove appliaction
     ansible.builtin.file:
       path: /tmp/catalogue.zip
       state: absent
+
   - name: downloading catalogue application
     ansible.builtin.get_url:
       url: https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip
       dest: /tmp/catalogue.zip
+
   - name: unarchive catalogue application
     ansible.builtin.unarchive:
       src: /tmp/catalogue.zip
       dest: /app
       remote_src: yes
+
   - name: install dependencies
     community.general.npm:
       path: /app
+
   - name: copy the catalogue.service file
     ansible.builtin.copy:
       src: catalogue.service
       dest: /etc/systemd/system/catalogue.service
+
   - name: daemon reload
     ansible.builtin.systemd_service:
       daemon_reload: true
@@ -55,20 +66,25 @@
       name: catalogue
       state: restarted
       enabled: yes
+
   - name: copy mongo.repo
     ansible.builtin.copy:
       src: mongo.repo
       dest: /etc/yum.repos.d/mongo.repo
   - name: install mongodb client
+
     ansible.builtin.dnf:
       name: mongodb-mongosh
       state: present
+
   - name: connnect to mongodb catalogue
     ansible.builtin.command: mongosh mongodb.daws89s.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')"
     register: catalogue_output
+
   - name: load products into mongodb
     ansible.builtin.shell: mongosh --host mongodb.daws89s.fun </app/db/master-data.js
     when: catalogue_output.stdout | int < 0
+    
   - name: restart and enable catalogue service
     ansible.builtin.service:
       name: catalogue
